@@ -1,0 +1,26 @@
+[{
+  "label": "Albumin",
+  "itemid": "50862",
+  "event_count": "749944",
+  "percentage": "0.63462412176377714"
+}, {
+  "label": "Creatinine",
+  "itemid": "50912",
+  "event_count": "3282278",
+  "percentage": "2.7775577818271326"
+}, {
+  "label": "Estimated GFR (MDRD equation)",
+  "itemid": "50920",
+  "event_count": "1373686",
+  "percentage": "1.1624524915582977"
+}, {
+  "label": "Potassium",
+  "itemid": "50971",
+  "event_count": "3150261",
+  "percentage": "2.665841210079257"
+}, {
+  "label": "Urea Nitrogen",
+  "itemid": "51006",
+  "event_count": "3189474",
+  "percentage": "2.6990243753378937"
+}]
