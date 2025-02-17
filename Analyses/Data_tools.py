@@ -5,9 +5,13 @@ import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 import datetime
+from itertools import permutations
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.decomposition import PCA
+from sklearn.linear_model import Ridge
+from skforecast.recursive import ForecasterRecursiveMultiSeries
+from skforecast.model_selection import backtesting_forecaster_multiseries
 
 def execute_query(sql_query, user, password, host, port, database):
     engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{database}')
@@ -19,13 +23,14 @@ def execute_query(sql_query, user, password, host, port, database):
         engine.dispose()
 
 
-# Connection parameters. You shouldn't have to change them.
+# Connection parameters
 f = open("./.db_login_info.json")
 params = json.load(f)[0]
 f.close()
 
 
 def load_json(file):
+    """Loads json file as panda dataframe"""
     f = open(f"../data/{file}.json")
     df = pd.DataFrame(json.load(f))
     f.close()
@@ -34,11 +39,13 @@ def load_json(file):
 
 
 def sqlify(l):
+    """Turns a python list to its representation as a string in sql. Strings are returned in quotes."""
     if isinstance(l[0], str):
         l = ["\'" + elt + "\'" for elt in l]
         return "(" + ", ".join(l) + ")"
     return "(" + ", ".join([str(elt) for elt in l]) + ")"
 
+# Defines used variables
 analyses = load_json("changed_analyses")
 analysis_codes = analyses["itemid"].to_list()
 analysis_codes
@@ -47,6 +54,7 @@ ckd_codes = load_json("ckd_codes")
 
 
 def add_simple_diagnosis(df) :
+    """Adds a simplified diagnosis column to a dataframe with specific diagnoses."""
     # Define a mapping for simplified categories
     simplified_mapping = {
     "5856": "Stage 5",
@@ -72,6 +80,7 @@ def add_simple_diagnosis(df) :
 
 
 def separate_values(df, grandeurs):
+    """Puts the measurements in distinct columns when they are in the same one."""
     # Separate the columns that need to be pivoted and the ones to remain unchanged
     df_measurements = df[['label', 'valuenum']]  # Columns related to the measurements
     df_other = df.drop(columns=['label', 'valuenum'])  # All other columns to remain unchanged
@@ -88,7 +97,7 @@ def separate_values(df, grandeurs):
     # Merge the pivoted data back with the remaining columns (those not pivoted)
     df_separated = pd.concat([df_separated, df_other], axis=1)
 
-    # Display the result
+    # Returns the result
     return df_separated
 
 
